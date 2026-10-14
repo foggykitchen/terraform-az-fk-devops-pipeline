@@ -161,7 +161,7 @@ Live verification completed on **October 14, 2026**:
 | Check | Result |
 |---|---|
 | Provisioning | 21 resources created across the initial and retry apply |
-| [Pipeline run #5](https://dev.azure.com/foggykitchendevops/fk-pipeline-02/_build/results?buildId=5) | Succeeded; Build and Deploy stages passed |
+| Pipeline run #5 (historical) | Succeeded; Build and Deploy stages passed |
 | Container build and local HTTP smoke test | Passed |
 | Runtime ARM OIDC authentication and ACR push | Passed |
 | Deploy exact image digest to Container Apps | Passed |
@@ -174,7 +174,7 @@ The run used source commit `892deff265ca719a4f05b46755c02bf866be02d2`; execution
 
 The initial apply created 13 resources before failing because a Consumption-only environment rejected a named workload profile, and the GitHub PAT was unavailable during apply. Setting `workload_profile_name = null` and supplying the PAT in the apply process environment resolved both errors; the retry created the remaining 8 resources. Keep source credentials available during both plan and apply.
 
-The lab remains deployed. Its HTTPS URL is available through `application_url`; use the hostname for ingress routing rather than the shared environment IP.
+The lab was subsequently destroyed on October 14, 2026. All 21 managed resources were removed and its Terraform state is empty. The screenshots record the successful run before cleanup; its former pipeline link and application endpoint are no longer live.
 
 ---
 
@@ -189,6 +189,8 @@ This example creates billable Azure resources. ACR Basic incurs a standing regis
 ```bash
 tofu destroy
 ```
+
+Cleanup was verified on October 14, 2026: the Resource Group no longer exists, the project is absent from the active Azure DevOps project list, and `tofu state list` is empty. The first attempt removed 17 resources; a retry removed the remaining 4 after Azure DevOps initially rejected ARM connection deletion despite the already-deleted federated credential. The Container Apps environment deletion took 11 minutes 13 seconds.
 
 Destroy removes the example’s Azure resources and Azure DevOps project, including pipeline run history and its artifacts. The application repository, organization and subscription remain external. Review project contents before deletion. If ARM connection deletion reports that an already-deleted federated credential still exists, verify its removal and retry after Entra propagation.
 
