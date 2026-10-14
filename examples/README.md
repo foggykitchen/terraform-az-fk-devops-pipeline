@@ -47,7 +47,7 @@ The recommended learning sequence is:
 
 Read the selected example's Deployment Steps before provisioning it. Both require an existing Azure DevOps organization and subscription, bootstrap authentication and administration rights. The upstream module now creates the GitHub PAT source connection and supplies its ID to the pipeline module. Configure `AZDO_GITHUB_SERVICE_CONNECTION_PAT` externally; Terraform handles the creation order. The PAT is retained in state, which must be protected. Both examples pin the upstream Git dependency to the reviewed v0.2.0 commit. The ARM OIDC connection does not authenticate GitHub.
 
-Both examples passed static validation with OpenTofu **1.11.6** on **October 14, 2026**. Initial verification used static checks only. Example 01 subsequently completed both its six-resource foundation apply and four-resource full apply. Its GitHub connectivity run #1 succeeded, followed by container build #4 with HTTP smoke test and published `APPLICATION_DOCKER_IMAGE`. ARM runtime OIDC exchange remains untested. Example 02 has not been deployed.
+Both examples passed static validation with OpenTofu **1.11.6** on **October 14, 2026**. Initial verification used static checks only. Example 01 subsequently completed both its six-resource foundation apply and four-resource full apply. Its GitHub connectivity run #1 succeeded, followed by container build #4 with HTTP smoke test and published `APPLICATION_DOCKER_IMAGE`. ARM runtime OIDC exchange remains untested. Example 01 was subsequently cleaned up: all 10 managed resources were removed and its state is empty. Example 02 has not been deployed.
 
 ---
 

@@ -165,13 +165,13 @@ Apply complete! Resources: 4 added, 0 changed, 0 destroyed.
 
 The full apply added the GitHub service connection, YAML pipeline definition and two individual endpoint authorizations. The example now manages **10 resources**. API inspection confirmed GitHub repository `foggykitchen/foggykitchen-hello-world`, branch `master`, YAML path `azure-pipelines.yml`, and access for pipeline ID `1` to both ARM and GitHub endpoints without all-pipeline grants.
 
-[Pipeline run #1](https://dev.azure.com/foggykitchendevops/fk-pipeline-01/_build/results?buildId=1) completed with **succeeded**. GitHub checkout and the **Hello World** step both succeeded. This confirms source authentication, remote YAML loading and placeholder execution. The run does not use the ARM connection, so runtime OIDC token exchange remains untested.
+Pipeline run #1 completed with **succeeded**. GitHub checkout and the **Hello World** step both succeeded. This confirms source authentication, remote YAML loading and placeholder execution. The run does not use the ARM connection, so runtime OIDC token exchange remains untested.
 
 The placeholder run reported a warning about the upcoming `ubuntu-latest` image migration; it did not prevent that test from succeeding. The build configuration pins `ubuntu-24.04`.
 
 The container build YAML passed YAML parsing and Bash syntax checks and was published to the source repository. Build #2 built the image but failed its first HTTP request while NGINX was starting (`curl` exit 56). The smoke test now retries transient startup errors for a bounded interval and still compares the served page with the source `index.html`.
 
-Run #3 was canceled while awaiting an agent. [Build #4](https://dev.azure.com/foggykitchendevops/fk-pipeline-01/_build/results?buildId=4), from source commit `070ace7354a059aa5be48e25078da1614c9844c5`, completed with **succeeded**:
+Run #3 was canceled while awaiting an agent. Build #4, from source commit `070ace7354a059aa5be48e25078da1614c9844c5`, completed with **succeeded**:
 
 | Build step | Result |
 |---|---|
@@ -190,7 +190,7 @@ The example outputs expose `project_id`, `service_connection_id`, `pipeline_id` 
 
 ## 📦 Build Artifact
 
-A successful build publishes `APPLICATION_DOCKER_IMAGE` with the compressed Docker image, `SHA256SUMS` and `image-metadata.txt`. Open [run #4’s published artifacts](https://dev.azure.com/foggykitchendevops/fk-pipeline-01/_build/results?buildId=4&view=artifacts&type=publishedArtifacts), or choose **1 published** in the run summary. The project’s left-menu **Artifacts** entry opens package feeds; this image archive belongs to the pipeline run. From the extracted `APPLICATION_DOCKER_IMAGE` directory, verify and load the image locally:
+A successful build publishes `APPLICATION_DOCKER_IMAGE` with the compressed Docker image, `SHA256SUMS` and `image-metadata.txt`. After provisioning your own example, open a successful run’s published artifacts or choose **1 published** in its summary. The recorded demo project has been cleaned up; its run/artifact links are no longer live. The project’s left-menu **Artifacts** entry opens package feeds; this image archive belongs to the pipeline run. From the extracted `APPLICATION_DOCKER_IMAGE` directory, verify and load the image locally:
 
 ```bash
 shasum -a 256 -c SHA256SUMS
@@ -203,7 +203,13 @@ gzip -dc foggykitchen-hello-world.tar.gz | docker load
 
 ## 🧹 Cleanup
 
-The two applies created ten managed resources in total. They remain deployed for screenshots and inspection; cleanup has not been performed.
+Cleanup completed on **October 14, 2026**. The first destroy removed six resources, then Azure DevOps briefly refused ARM endpoint deletion because it still observed the already-deleted federated credential. Entra’s credential list was verified empty; retrying destroy removed the remaining four resources:
+
+```text
+Destroy complete! Resources: 4 destroyed.
+```
+
+All **10 managed resources** were removed across the two attempts. `tofu state list` is empty, the Resource Group no longer exists, and the project is absent from the organization’s active project list. Screenshots preserve the successful test evidence. The organization, subscription and GitHub source repository were retained.
 
 After a future deployment, review project contents and source-connection ownership before destroying the example. The configuration manages the project, Entra identity, ARM connection, federated trust, Resource Group, GitHub connection, pipeline definition and its individual permissions. Review Resource Group contents before deletion. Project deletion can also remove contents added independently. The GitHub source endpoint is now owned by the upstream module in this example’s state. The GitHub repository, Azure DevOps organization and Azure subscription remain externally managed.
 

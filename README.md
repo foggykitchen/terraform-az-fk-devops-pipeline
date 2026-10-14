@@ -200,7 +200,7 @@ Static verification completed on **October 14, 2026** with OpenTofu **1.11.6**:
 | Example 01 | Passed | Passed | Passed |
 | Example 02 | Passed | Passed | Passed |
 
-Both example YAML files passed syntax checks; Example 01’s Bash build scripts also passed syntax checks. Initial module verification used static checks only. Example 01 subsequently completed a six-resource foundation apply and a four-resource full apply. API checks confirmed its GitHub/YAML pointer and individual endpoint permissions. Connectivity run #1 succeeded, then container build #4 passed image build, HTTP smoke testing, export and `APPLICATION_DOCKER_IMAGE` publication. The container build does not exercise runtime ARM OIDC authentication. Example 02 remains statically validated only. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
+Both example YAML files passed syntax checks; Example 01’s Bash build scripts also passed syntax checks. Initial module verification used static checks only. Example 01 subsequently completed a six-resource foundation apply and a four-resource full apply. API checks confirmed its GitHub/YAML pointer and individual endpoint permissions. Connectivity run #1 succeeded, then container build #4 passed image build, HTTP smoke testing, export and `APPLICATION_DOCKER_IMAGE` publication. The container build does not exercise runtime ARM OIDC authentication. Example 01 cleanup subsequently removed all 10 managed resources; its state is empty. Example 02 remains statically validated only. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
 
 ---
 
