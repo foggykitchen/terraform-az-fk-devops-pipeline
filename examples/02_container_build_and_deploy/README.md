@@ -96,16 +96,51 @@ After Deploy succeeds, open the `application_url` output. Confirm that the activ
 
 ## 🖼️ Azure DevOps and Azure Portal View
 
-No runtime screenshots have been collected for this CI/CD version yet. Capture evidence only after a successful run:
+The following screenshots record the successful CI/CD lab on October 14, 2026.
 
-1. Pipeline run with both Build and Deploy stages successful
-2. GitHub and ARM service connections with individual pipeline permissions
-3. `fk-configuration` values and pipeline permission
-4. ACR repository showing the build tag and digest
-5. Container App revision showing the deployed image digest
-6. The application served at its HTTPS URL
+<img src="02_container_build_and_deploy_resource_group.jpg" width="900"/>
 
-Keep credentials, tokens and state out of screenshots.
+*Figure 1. Azure resources filtered to foggykitchen-pipeline-02-rg: managed identity, Container App, environment, Log Analytics workspace and ACR.*
+
+<img src="02_container_build_and_deploy_pipeline.jpg" width="900"/>
+
+*Figure 2. Azure DevOps Pipelines overview showing fk-pipeline-02 and its successful manual run on master.*
+
+<img src="02_container_build_and_deploy_pipeline_run.jpg" width="900"/>
+
+*Figure 3. Successful run #20261014.1 (build ID 5), showing completed Build and Deploy stages and one published artifact.*
+
+<img src="02_container_build_and_deploy_build_steps.jpg" width="900"/>
+
+*Figure 4. Successful image build, container smoke test, OIDC-authenticated ACR push and metadata publication. The push log records the image digest.*
+
+<img src="02_container_build_and_deploy_deploy_steps.jpg" width="900"/>
+
+*Figure 5. Successful deployment and HTTPS verification through the ARM OIDC connection. The log confirms application content verification.*
+
+<img src="02_container_build_and_deploy_variable_group.jpg" width="900"/>
+
+*Figure 6. Nonsecret fk-configuration variables supplying registry, application, Resource Group and environment values to YAML.*
+
+<img src="02_container_build_and_deploy_arm_pipeline_permissions.jpg" width="900"/>
+
+*Figure 7. Individual permission allowing fk-pipeline-02 to use the fk-azure-oidc ARM service connection.*
+
+<img src="02_container_build_and_deploy_acr_image.jpg" width="900"/>
+
+*Figure 8. ACR repository foggykitchen-hello-world containing build tag 5 and its displayed image digest.*
+
+<img src="02_container_build_and_deploy_container_app_revision.jpg" width="900"/>
+
+*Figure 9. Details of active revision fk-pipeline-02-app--0000001 with 100% traffic allocation, scaled to zero at capture time.*
+
+<img src="02_container_build_and_deploy_containers.jpg" width="900"/>
+
+*Figure 10. Container configuration view for hello, showing its revision, registry and managed-identity authentication option. This view does not display the selected image digest or identity.*
+
+<img src="02_container_build_and_deploy_http_access.jpg" width="900"/>
+
+*Figure 11. The hello-world application served through its Azure Container Apps hostname. The OCI release wording belongs to the shared application source.*
 
 ---
 
