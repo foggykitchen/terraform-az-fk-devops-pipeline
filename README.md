@@ -38,7 +38,7 @@ The module intentionally does **not** create:
 - YAML pipeline file content; only its repository-relative path is accepted
 - Source repositories, Azure resources, Azure role assignments, environments or approval/check policies
 
-**All delivery logic remains in caller-owned YAML.** Example 01 includes a reference copy of a container build, smoke test and image archive publication workflow. Example 02 retains a minimal placeholder for its resource-authorization lesson. Neither contains an OpenTofu plan/apply template.
+**All delivery logic remains in caller-owned YAML.** Example 01 includes a reference copy of a container build, smoke test and image archive publication workflow. Example 02 demonstrates ACR publication, OIDC deployment to Container Apps and HTTPS verification. Neither contains an OpenTofu plan/apply template.
 
 ---
 
@@ -87,7 +87,7 @@ No credentials, secrets, state or real tfvars belong in Git. Static validation d
 terraform-az-fk-devops-pipeline/
 ├── examples/
 │   ├── 01_pipeline_definition_github_source/
-│   ├── 02_pipeline_with_variable_group_authorization/
+│   ├── 02_container_build_and_deploy/
 │   └── README.md
 ├── main.tf
 ├── variables.tf
@@ -99,7 +99,7 @@ terraform-az-fk-devops-pipeline/
 └── README.md
 ```
 
-Examples use responsibility-named `devops.tf` and `pipeline.tf`, plus `providers.tf`, `variables.tf`, `outputs.tf`, `terraform.tfvars.example`, `README.md` and an `azure-pipelines.yml` reference file. Example 01 also creates its Resource Group in `resource_group.tf`. Lockfiles and state are ignored.
+Examples use responsibility-named `devops.tf` and `pipeline.tf`, plus `providers.tf`, `variables.tf`, `outputs.tf`, `terraform.tfvars.example`, `README.md` and an `azure-pipelines.yml` reference file. Both examples create their Resource Group in `resource_group.tf`. Example 02 additionally composes `acr.tf`, `container_app.tf`, `identity.tf`, `log_analytics.tf` and `rbac.tf`. Lockfiles and state are ignored.
 
 ---
 
@@ -167,9 +167,9 @@ See [variables.tf](variables.tf) for the exact nested object schema and validati
 ## 🧭 Examples
 
 - [01_pipeline_definition_github_source](examples/01_pipeline_definition_github_source/): GitHub pointer with upstream project/WIF/GitHub outputs and a caller-owned container build workflow.
-- [02_pipeline_with_variable_group_authorization](examples/02_pipeline_with_variable_group_authorization/): adds upstream nonsecret group attachment and per-pipeline authorization, demonstrating attachment and explicit permission as separate control-plane operations.
+- [02_container_build_and_deploy](examples/02_container_build_and_deploy/): extends CI to CI/CD with ACR push, OIDC deployment to Container Apps, variable-group consumption and HTTPS verification. Infrastructure is composed from dedicated FoggyKitchen modules; delivery logic remains in YAML.
 
-See [examples](examples/README.md). Example 01’s source YAML builds and tests the NGINX image and publishes its archive. Example 02’s YAML is a placeholder. Neither includes OpenTofu plan/apply or OIDC deployment logic.
+See [examples](examples/README.md). Example 01’s source YAML builds and tests the NGINX image and publishes its archive. Example 02’s YAML builds and pushes the tested image, then deploys its digest through OIDC and verifies HTTPS. Neither includes an OpenTofu plan/apply template.
 
 ---
 
@@ -200,7 +200,7 @@ Static verification completed on **October 14, 2026** with OpenTofu **1.11.6**:
 | Example 01 | Passed | Passed | Passed |
 | Example 02 | Passed | Passed | Passed |
 
-Both example YAML files passed syntax checks; Example 01’s Bash build scripts also passed syntax checks. Initial module verification used static checks only. Example 01 subsequently completed a six-resource foundation apply and a four-resource full apply. API checks confirmed its GitHub/YAML pointer and individual endpoint permissions. Connectivity run #1 succeeded, then container build #4 passed image build, HTTP smoke testing, export and `APPLICATION_DOCKER_IMAGE` publication. The container build does not exercise runtime ARM OIDC authentication. Example 01 cleanup subsequently removed all 10 managed resources; its state is empty. Example 02 remains statically validated only. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
+Both example YAML files and their Bash scripts passed syntax checks. Initial module verification used static checks only. Example 01 subsequently completed a six-resource foundation apply and a four-resource full apply. API checks confirmed its GitHub/YAML pointer and individual endpoint permissions. Connectivity run #1 succeeded, then container build #4 passed image build, HTTP smoke testing, export and `APPLICATION_DOCKER_IMAGE` publication. The container build does not exercise runtime ARM OIDC authentication. Example 01 cleanup subsequently removed all 10 managed resources; its state is empty. Example 02 created 21 resources and completed run #5: build, smoke test, OIDC-authenticated ACR push, digest deployment to Container Apps and HTTPS verification all passed. An independent check matched the artifact digest to ACR and the deployed revision; the post-deployment OpenTofu plan reported no changes. Its lab remains deployed. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
 
 ---
 

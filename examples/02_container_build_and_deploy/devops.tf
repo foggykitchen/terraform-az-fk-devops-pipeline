@@ -16,7 +16,14 @@ module "devops" {
     configuration = {
       name         = "fk-configuration"
       allow_access = false
-      variables    = { environment = "dev" }
+      variables = {
+        environment       = "dev"
+        acrName           = module.acr.acr_name
+        acrLoginServer    = module.acr.acr_login_server
+        resourceGroupName = azurerm_resource_group.foggykitchen_rg.name
+        containerAppName  = module.container_app.name
+        applicationUrl    = "https://${module.container_app.fqdn}"
+      }
     }
   }
 }
