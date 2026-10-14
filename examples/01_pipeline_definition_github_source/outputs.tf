@@ -10,3 +10,8 @@ output "service_connection_id" {
   description = "Upstream ARM OIDC connection ID."
   value       = module.devops.service_connection_id
 }
+
+output "resource_group_id" {
+  description = "Resource Group ID for external Azure RBAC composition."
+  value       = azurerm_resource_group.foggykitchen_rg.id
+}

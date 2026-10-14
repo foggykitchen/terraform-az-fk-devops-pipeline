@@ -5,9 +5,9 @@ module "pipeline" {
   pipeline_name         = "fk-pipeline-01"
   service_connection_id = module.devops.service_connection_id
   repository = {
-    id                    = "foggykitchen/terraform-az-fk-devops-pipeline"
-    branch_name           = "main"
+    id                    = "foggykitchen/foggykitchen-hello-world"
+    branch_name           = "master"
     service_connection_id = var.github_service_connection_id
   }
-  yaml_path = "examples/01_pipeline_definition_github_source/azure-pipelines.yml"
+  yaml_path = "azure-pipelines.yml"
 }

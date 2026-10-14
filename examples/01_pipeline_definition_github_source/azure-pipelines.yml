@@ -1,7 +1,10 @@
-# Placeholder only; the plan/apply reference pipeline is a separate deliverable.
+# Local copy of the minimal placeholder referenced in foggykitchen-hello-world.
 trigger: none
 pr: none
+
 pool:
   vmImage: ubuntu-latest
+
 steps:
-  - script: echo "Pipeline definition placeholder"
+  - script: echo "Hello from Azure Pipelines"
+    displayName: Hello World

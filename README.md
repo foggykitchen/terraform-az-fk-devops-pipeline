@@ -44,7 +44,7 @@ The module intentionally does **not** create:
 
 ## Provider Notes
 
-The module pins **microsoft/azuredevops = 1.16.0**, matching `terraform-az-fk-devops`. The provider schema was verified on **October 14, 2026**. Terraform/OpenTofu **>= 1.5.0** matches the upstream minimum. Only the examples need **hashicorp/azuread = 3.10.0** to compose the upstream module; no AzureRM provider is used.
+The module pins **microsoft/azuredevops = 1.16.0**, matching `terraform-az-fk-devops`. The provider schema was verified on **October 14, 2026**. Terraform/OpenTofu **>= 1.5.0** matches the upstream minimum. Both examples use **hashicorp/azuread = 3.10.0** to compose the upstream module. Example 01 also pins **hashicorp/azurerm = 4.81.0** for its Resource Group, following the upstream example convention. The root module has no AzureRM requirement.
 
 The [provider resource](https://github.com/microsoft/terraform-provider-azuredevops/blob/v1.16.0/website/docs/r/build_definition.html.markdown) requires `project_id`, `name` and `repository { repo_type, repo_id }`. It also supports `branch_name`, `yml_path` and source `service_connection_id`. This module strengthens those requirements with an explicit nonblank YAML path, branch default `main`, and source-specific validations. It exposes no classic jobs. Initial automatic execution is suppressed with `features.skip_first_run = true`.
 
@@ -99,7 +99,7 @@ terraform-az-fk-devops-pipeline/
 └── README.md
 ```
 
-Examples use responsibility-named `devops.tf` and `pipeline.tf`, plus `providers.tf`, `variables.tf`, `outputs.tf`, `terraform.tfvars.example`, `README.md` and a minimal `azure-pipelines.yml` placeholder. Lockfiles and state are ignored.
+Examples use responsibility-named `devops.tf` and `pipeline.tf`, plus `providers.tf`, `variables.tf`, `outputs.tf`, `terraform.tfvars.example`, `README.md` and a minimal `azure-pipelines.yml` placeholder. Example 01 also creates its Resource Group in `resource_group.tf`. Lockfiles and state are ignored.
 
 ---
 
@@ -200,7 +200,7 @@ Static verification completed on **October 14, 2026** with OpenTofu **1.11.6**:
 | Example 01 | Passed | Passed | Passed |
 | Example 02 | Passed | Passed | Passed |
 
-Both placeholder YAML files passed syntax checks. No plan, apply or pipeline execution was performed. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
+Both placeholder YAML files passed syntax checks. Initial module verification used static checks only. A subsequent foundation apply for Example 01 created six resources: the upstream project/WIF identity resources and its Resource Group. Pipeline creation remains pending GitHub source setup; no pipeline execution was performed. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
 
 ---
 

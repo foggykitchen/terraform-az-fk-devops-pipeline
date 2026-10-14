@@ -14,3 +14,20 @@ variable "github_service_connection_id" {
   description = "Existing GitHub source endpoint UUID in the project; not the ARM OIDC endpoint."
   type        = string
 }
+
+variable "tenant_id" {
+  description = "Existing Entra tenant ID."
+  type        = string
+}
+
+variable "resource_group_name" {
+  description = "Resource Group created by this example."
+  type        = string
+  default     = "foggykitchen-rg"
+}
+
+variable "location" {
+  description = "Azure region for the example Resource Group."
+  type        = string
+  default     = "westeurope"
+}

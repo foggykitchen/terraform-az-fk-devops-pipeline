@@ -47,7 +47,7 @@ The recommended learning sequence is:
 
 Read the selected example's Deployment Steps before provisioning it. Both require an existing Azure DevOps organization and subscription, bootstrap authentication and administration rights. A fresh project requires staged setup: create the upstream resources, register a GitHub source connection in that project, then register the pipeline. The ARM OIDC connection does not authenticate GitHub.
 
-Both examples passed static validation with OpenTofu **1.11.6** on **October 14, 2026**. No plan, apply or pipeline execution was performed.
+Both examples passed static validation with OpenTofu **1.11.6** on **October 14, 2026**. Initial verification used static checks only. Example 01 subsequently deployed its six-resource project/WIF/Resource Group foundation; its pipeline stage is pending GitHub source setup. Example 02 has not been deployed. No pipeline execution has been tested.
 
 ---
 
@@ -67,7 +67,7 @@ These examples intentionally avoid:
 - Creating GitHub source connections
 - Generating YAML delivery logic or a plan/apply template
 - Granting all-pipeline access
-- Creating Azure role assignments, networking or deployment targets
+- Creating Azure role assignments, networking or deployment targets; Example 01 creates only an empty Resource Group for external composition
 - Sharing state or requiring Example 01 to be deployed before Example 02
 
 ---
