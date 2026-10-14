@@ -10,10 +10,7 @@ variable "subscription_name" {
   description = "Existing Azure subscription display name."
   type        = string
 }
-variable "github_service_connection_id" {
-  description = "Existing GitHub source endpoint UUID in the project; not the ARM OIDC endpoint."
-  type        = string
-}
+
 
 variable "tenant_id" {
   description = "Existing Entra tenant ID."

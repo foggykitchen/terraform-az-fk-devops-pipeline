@@ -7,7 +7,7 @@ module "pipeline" {
   repository = {
     id                    = "foggykitchen/terraform-az-fk-devops-pipeline"
     branch_name           = "main"
-    service_connection_id = var.github_service_connection_id
+    service_connection_id = module.devops.github_service_connection_ids["hello_world"]
   }
   yaml_path          = "examples/02_pipeline_with_variable_group_authorization/azure-pipelines.yml"
   variable_group_ids = module.devops.variable_group_ids

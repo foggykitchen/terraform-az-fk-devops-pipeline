@@ -2,7 +2,7 @@
 
 In this second Azure Pipelines example, we extend the **GitHub-sourced YAML pipeline definition** with **variable-group attachment and individual authorization** using **Terraform / OpenTofu**.
 
-The example composes **terraform-az-fk-devops** with the local pipeline module. Shared project and ARM federation resources are created upstream; an existing GitHub source connection supplies repository access.
+The example composes **terraform-az-fk-devops** with the local pipeline module. Shared project and ARM federation resources are created upstream; an optional GitHub PAT source connection is created by the upstream module.
 
 ---
 
@@ -14,7 +14,7 @@ The pipeline definition points at a YAML path on the `main` branch of `foggykitc
 flowchart LR
     D[FK DevOps module] --> P[Azure DevOps project]
     D --> A[ARM OIDC connection and federated trust]
-    G[Existing GitHub source connection] --> B[YAML pipeline definition]
+    G[Upstream GitHub source connection] --> B[YAML pipeline definition]
     R[Existing GitHub repository] --> Y[Committed placeholder YAML]
     Y --> B
     P --> B
@@ -32,7 +32,7 @@ This example creates:
 - One Azure DevOps project through `terraform-az-fk-devops`
 - One Entra application/service principal, ARM WIF connection and federated credential through the upstream module
 - One YAML pipeline definition through the local `terraform-az-fk-devops-pipeline` module
-- Individual pipeline permissions for the existing GitHub source endpoint and upstream ARM endpoint
+- Individual pipeline permissions for the upstream GitHub source endpoint and upstream ARM endpoint
 - One nonsecret `fk-configuration` variable group through the upstream module
 - Definition-level group attachment and individual `variablegroup` authorization
 
@@ -40,7 +40,7 @@ The upstream module creates `fk-configuration` with `environment = "dev"` and `a
 
 The placeholder does not consume the group. A real YAML pipeline must reference the group by name in caller-owned content; definition metadata and authorization do not generate that YAML declaration.
 
-The organization, subscription, GitHub repository and GitHub source endpoint already exist. No source repository, Azure role assignment, networking or deployment target is created.
+The organization, subscription and GitHub repository already exist. The GitHub endpoint is created through the upstream module. No source repository, Azure role assignment, networking or deployment target is created.
 
 **Stages, jobs, steps and trigger logic remain in YAML.** The committed `azure-pipelines.yml` is only a placeholder with CI and PR triggers disabled and a single echo step. It contains no OpenTofu plan/apply or OIDC login logic and does not use the ARM connection.
 
@@ -68,18 +68,18 @@ This example focuses on:
 - Rights to create projects, ARM connections and pipeline definitions, and to manage individual pipeline resource permissions
 - Entra rights to create/manage applications, service principals and federated credentials
 - Bootstrap authentication configured externally for the AzureDevOps and AzureAD providers
-- A GitHub source connection in this example's project with access to the referenced repository
+- A GitHub PAT with source access, supplied through `AZDO_GITHUB_SERVICE_CONNECTION_PAT` in the execution environment
 - The placeholder YAML published on the repository's selected remote branch
 
-Copy `terraform.tfvars.example` to ignored `terraform.tfvars` and replace the nonsecret placeholder identifiers. Keep provider credentials outside HCL and tfvars. The GitHub endpoint ID and ARM endpoint ID identify different resources.
+Copy `terraform.tfvars.example` to ignored `terraform.tfvars` and replace the nonsecret placeholder identifiers. Keep provider credentials outside HCL and tfvars. The upstream GitHub endpoint and ARM endpoint identify different resources. The GitHub provider stores its PAT in state, including when read from the environment; secure the state and never commit credentials.
 
-### Stage 1 — Prepare the project and source access
+### Stage 1 — Prepare source credentials and YAML
 
-For a fresh environment, provision the upstream resources declared in `devops.tf` as a separate bootstrap stage before registering the pipeline. The project name is `fk-pipeline-02`. Register a GitHub App/service connection in that project through an independently managed setup, then set `github_service_connection_id` to its ID. A connection from another project is not a substitute.
+The upstream dependency in `devops.tf` is pinned to commit `25a5eca15641c81b23cad6d0a1d84330bc634dbf`, released as [terraform-az-fk-devops v0.2.0](https://github.com/foggykitchen/terraform-az-fk-devops/releases/tag/v0.2.0). Configure the GitHub PAT externally through `AZDO_GITHUB_SERVICE_CONNECTION_PAT`. The example requests `hello_world = { name = "fk-github-hello-world" }` from the upstream module; its `github_service_connection_ids["hello_world"]` output feeds the pipeline repository block.
 
-The configuration requires this staged prerequisite; it does not create a GitHub endpoint automatically. When upstream resources are already managed in this example's state, retain that ownership. Avoid creating a second project with the same name in a separate state without reconciling ownership.
+The upstream module owns GitHub source endpoint creation. Terraform orders project creation, GitHub connection creation, pipeline registration and individual authorization. Existing foundation resources remain at the same resource addresses in the local state.
 
-Publish the referenced `examples/02_pipeline_with_variable_group_authorization/azure-pipelines.yml` on the remote `main` branch. A local file or local commit alone does not make the path available to Azure DevOps.
+The referenced `examples/02_pipeline_with_variable_group_authorization/azure-pipelines.yml` must exist on `main` in `foggykitchen/terraform-az-fk-devops-pipeline`. A local file or commit alone does not publish YAML to the source repository.
 
 ### Stage 2 — Validate the pipeline configuration
 
@@ -93,9 +93,9 @@ tofu fmt -check
 tofu validate
 ```
 
-`devops.tf` composes the upstream module at a reviewed commit. `pipeline.tf` uses the local root module source `../..`. `providers.tf`, `variables.tf` and `outputs.tf` provide the example wrapper. The pipeline definition suppresses its initial automatic run.
+`devops.tf` composes the upstream module at the reviewed v0.2.0 commit. `pipeline.tf` uses the local root module source `../..`. `providers.tf`, `variables.tf` and `outputs.tf` provide the example wrapper. The pipeline definition suppresses its initial automatic run.
 
-Provisioning is a separate operator action after the prerequisites are ready and the configuration has been reviewed. No deployment was performed during this example's verification. The ARM connection grants no Azure RBAC; compose the dedicated RBAC module externally when a future workload needs subscription access.
+Provisioning follows after source credentials are ready and the configuration has been reviewed. No deployment was performed during this example's verification. The ARM connection grants no Azure RBAC; compose the dedicated RBAC module externally when a future workload needs subscription access.
 
 ---
 
@@ -130,7 +130,7 @@ The example outputs expose `project_id`, `service_connection_id` and `pipeline_i
 
 Static validation created no Azure or Azure DevOps resources, so no cloud cleanup was required.
 
-After a future deployment, review project contents and source-connection ownership before destroying the example. The configuration manages the project, Entra identity, ARM connection, federated trust, pipeline definition and its individual permissions, plus the upstream variable group. Project deletion can also remove contents added independently, including the GitHub source endpoint. The GitHub repository, Azure DevOps organization and Azure subscription remain externally managed.
+After a future deployment, review project contents and source-connection ownership before destroying the example. The configuration manages the project, Entra identity, ARM connection, federated trust, GitHub connection, pipeline definition and its individual permissions, plus the upstream variable group. Project deletion can also remove contents added independently. The GitHub source endpoint is now owned by the upstream module in this example’s state. The GitHub repository, Azure DevOps organization and Azure subscription remain externally managed.
 
 ---
 

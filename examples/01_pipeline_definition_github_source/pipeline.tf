@@ -7,7 +7,7 @@ module "pipeline" {
   repository = {
     id                    = "foggykitchen/foggykitchen-hello-world"
     branch_name           = "master"
-    service_connection_id = var.github_service_connection_id
+    service_connection_id = module.devops.github_service_connection_ids["hello_world"]
   }
   yaml_path = "azure-pipelines.yml"
 }

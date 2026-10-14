@@ -1,7 +1,11 @@
 module "devops" {
-  source = "git::https://github.com/foggykitchen/terraform-az-fk-devops.git?ref=cf5a49b17958108aa874ef8010800f48bb4b10f6"
+  source = "git::https://github.com/foggykitchen/terraform-az-fk-devops.git?ref=25a5eca15641c81b23cad6d0a1d84330bc634dbf"
 
   project_name = "fk-pipeline-01"
+  github_service_connections = {
+    hello_world = { name = "fk-github-hello-world" }
+  }
+
   service_connection = {
     name              = "fk-azure-oidc"
     subscription_id   = var.subscription_id

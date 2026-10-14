@@ -10,3 +10,8 @@ output "service_connection_id" {
   description = "Upstream ARM OIDC connection ID."
   value       = module.devops.service_connection_id
 }
+
+output "github_service_connection_id" {
+  description = "GitHub source connection ID created by the upstream module."
+  value       = module.devops.github_service_connection_ids["hello_world"]
+}

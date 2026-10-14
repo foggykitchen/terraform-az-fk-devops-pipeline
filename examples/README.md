@@ -13,7 +13,7 @@ These examples are part of the **[FoggyKitchen.com training ecosystem](https://f
 
 | Example | Title | Key Topics |
 |:-------:|:------|:-----------|
-| [01](01_pipeline_definition_github_source/) | **Pipeline Definition with GitHub Source** | Upstream project/WIF composition, existing GitHub connection, YAML path, individual endpoint permissions |
+| [01](01_pipeline_definition_github_source/) | **Pipeline Definition with GitHub Source** | Upstream project/WIF composition, upstream GitHub connection, YAML path, individual endpoint permissions |
 | [02](02_pipeline_with_variable_group_authorization/) | **Pipeline with Variable Group Authorization** | Same foundation, upstream nonsecret configuration group, definition attachment, individual group permissions |
 
 Each example builds on the **concepts** introduced in the previous one, but uses its own configuration and state. The examples use different project names: `fk-pipeline-01` and `fk-pipeline-02`.
@@ -45,9 +45,9 @@ tofu validate
 The recommended learning sequence is:
 **01 → 02**
 
-Read the selected example's Deployment Steps before provisioning it. Both require an existing Azure DevOps organization and subscription, bootstrap authentication and administration rights. A fresh project requires staged setup: create the upstream resources, register a GitHub source connection in that project, then register the pipeline. The ARM OIDC connection does not authenticate GitHub.
+Read the selected example's Deployment Steps before provisioning it. Both require an existing Azure DevOps organization and subscription, bootstrap authentication and administration rights. The upstream module now creates the GitHub PAT source connection and supplies its ID to the pipeline module. Configure `AZDO_GITHUB_SERVICE_CONNECTION_PAT` externally; Terraform handles the creation order. The PAT is retained in state, which must be protected. Both examples pin the upstream Git dependency to the reviewed v0.2.0 commit. The ARM OIDC connection does not authenticate GitHub.
 
-Both examples passed static validation with OpenTofu **1.11.6** on **October 14, 2026**. Initial verification used static checks only. Example 01 subsequently deployed its six-resource project/WIF/Resource Group foundation; its pipeline stage is pending GitHub source setup. Example 02 has not been deployed. No pipeline execution has been tested.
+Both examples passed static validation with OpenTofu **1.11.6** on **October 14, 2026**. Initial verification used static checks only. Example 01 subsequently completed both its six-resource foundation apply and four-resource full apply. Its GitHub checkout and Hello World run #1 succeeded; ARM runtime OIDC exchange remains untested. Example 02 has not been deployed.
 
 ---
 
@@ -55,7 +55,7 @@ Both examples passed static validation with OpenTofu **1.11.6** on **October 14,
 
 - One example = one architectural goal
 - Shared projects, ARM OIDC trust and variable groups composed through `terraform-az-fk-devops`
-- GitHub source access supplied separately from Azure workload authentication
+- GitHub source access composed upstream and kept separate from Azure workload authentication
 - Explicit permissions for an individual pipeline
 - YAML owns stages, jobs, steps and trigger logic
 - Provider credentials and secret values stay outside source control
@@ -64,7 +64,7 @@ Both examples passed static validation with OpenTofu **1.11.6** on **October 14,
 These examples intentionally avoid:
 
 - Creating the Azure DevOps organization or source repositories
-- Creating GitHub source connections
+- Declaring raw GitHub endpoint resources in example code; connections are composed through the upstream module
 - Generating YAML delivery logic or a plan/apply template
 - Granting all-pipeline access
 - Creating Azure role assignments, networking or deployment targets; Example 01 creates only an empty Resource Group for external composition

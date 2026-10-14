@@ -34,7 +34,7 @@ The module intentionally does **not** create:
 - Pipeline stages, jobs, steps or trigger logic, including plan/apply, canary or blue-green workflows
 - Classic/designer pipelines, despite the provider exposing classic `jobs` on the same resource
 - Azure DevOps projects, service connections or variable groups; use the upstream module for shared ARM/WIF resources and groups
-- GitHub source connections; register these independently before supplying their IDs
+- GitHub source connections; compose optional connections from `terraform-az-fk-devops`
 - YAML pipeline file content; only its repository-relative path is accepted
 - Source repositories, Azure resources, Azure role assignments, environments or approval/check policies
 
@@ -54,7 +54,7 @@ The [provider resource](https://github.com/microsoft/terraform-provider-azuredev
 
 For Azure Repos, set `type = "TfsGit"`, supply the existing repository UUID, and omit `repository.service_connection_id`. A repository name can be resolved by the caller's `azuredevops_git_repository` data source; this module takes its ID. Branch names may use `main` or `refs/heads/main`; provider 1.16.0 normalizes the prefix. GitHub Enterprise, generic Git and Bitbucket are outside this module's supported source contract.
 
-Install/configure GitHub App access externally, or independently manage a supported source endpoint. The [GitHub endpoint provider documentation](https://github.com/microsoft/terraform-provider-azuredevops/blob/v1.16.0/website/docs/r/serviceendpoint_github.html.markdown) explains PAT support and external OAuth/App setup/import requirements. No source credentials are accepted by this module.
+For PAT-based connections, configure `github_service_connections` on `terraform-az-fk-devops` and pass its `github_service_connection_ids` output here. Supply the PAT securely at runtime; the provider retains it in state. GitHub App access and OAuth consent still require external setup. The [GitHub endpoint provider documentation](https://github.com/microsoft/terraform-provider-azuredevops/blob/v1.16.0/website/docs/r/serviceendpoint_github.html.markdown) explains PAT support and external OAuth/App setup/import requirements. No source credentials are accepted by this module.
 
 ### CI selector and YAML ownership
 
@@ -105,25 +105,25 @@ Examples use responsibility-named `devops.tf` and `pipeline.tf`, plus `providers
 
 ## 🚀 Example Usage
 
-After composing the upstream module as `module.devops` and independently registering the GitHub source endpoint:
+After composing `terraform-az-fk-devops` as `module.devops` with a `hello_world` GitHub connection:
 
 ```hcl
 module "pipeline" {
-  source = "./terraform-az-fk-devops-pipeline"
+  source = "git::https://github.com/foggykitchen/terraform-az-fk-devops-pipeline.git?ref=v0.1.0"
 
   project_id            = module.devops.project_id
   pipeline_name         = "fk-delivery"
   service_connection_id = module.devops.service_connection_id
   repository = {
     id                    = "your-organization/your-repository"
-    service_connection_id = var.github_service_connection_id
+    service_connection_id = module.devops.github_service_connection_ids["hello_world"]
   }
   yaml_path          = "azure-pipelines.yml"
   variable_group_ids = module.devops.variable_group_ids
 }
 ```
 
-The local source path assumes this module has been checked out at that location. The numbered examples use `../..` and pin upstream composition to a reviewed commit. A fresh project's GitHub endpoint needs staged bootstrap; see the example READMEs.
+The numbered examples use `../..` for this module and pin the upstream Git dependency to commit `25a5eca15641c81b23cad6d0a1d84330bc634dbf`, released as `v0.2.0`. The upstream module creates the GitHub endpoint before pipeline registration; see the example READMEs for external PAT configuration.
 
 For an existing Azure Repos source, replace `repository` with:
 
@@ -166,7 +166,7 @@ See [variables.tf](variables.tf) for the exact nested object schema and validati
 
 ## 🧭 Examples
 
-- [01_pipeline_definition_github_source](examples/01_pipeline_definition_github_source/): minimal GitHub pointer with upstream project/WIF outputs and an existing source endpoint.
+- [01_pipeline_definition_github_source](examples/01_pipeline_definition_github_source/): minimal GitHub pointer with upstream project/WIF/GitHub outputs.
 - [02_pipeline_with_variable_group_authorization](examples/02_pipeline_with_variable_group_authorization/): adds upstream nonsecret group attachment and per-pipeline authorization, demonstrating attachment and explicit permission as separate control-plane operations.
 
 See [examples](examples/README.md). Both placeholders contain no plan/apply or OIDC deployment logic.
@@ -184,7 +184,7 @@ See [examples](examples/README.md). Both placeholders contain no plan/apply or O
 
 1. Configure the organization and bootstrap provider authentication externally.
 2. Create project/WIF trust and optional groups with `terraform-az-fk-devops`.
-3. Register source-host access externally; publish caller-owned YAML in the repository.
+3. Request optional GitHub PAT source access from the upstream module and publish caller-owned YAML in the repository.
 4. Call this module with the upstream IDs, source endpoint and YAML path.
 5. Grant workload-specific Azure RBAC externally and author delivery logic in the source repository’s YAML.
 
@@ -200,7 +200,7 @@ Static verification completed on **October 14, 2026** with OpenTofu **1.11.6**:
 | Example 01 | Passed | Passed | Passed |
 | Example 02 | Passed | Passed | Passed |
 
-Both placeholder YAML files passed syntax checks. Initial module verification used static checks only. A subsequent foundation apply for Example 01 created six resources: the upstream project/WIF identity resources and its Resource Group. Pipeline creation remains pending GitHub source setup; no pipeline execution was performed. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
+Both placeholder YAML files passed syntax checks. Initial module verification used static checks only. Example 01 subsequently completed a six-resource foundation apply and a four-resource full apply. API checks confirmed its GitHub/YAML pointer and individual endpoint permissions; Hello World run #1 succeeded. Runtime ARM OIDC authentication is not exercised by that placeholder. Example 02 remains statically validated only. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
 
 ---
 
