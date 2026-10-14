@@ -1,8 +1,11 @@
-**/.terraform/*
+.terraform/
+.tofu/
 .terraform.lock.hcl
+.terraform.tfstate.lock.info
 *.tfstate
 *.tfstate.*
 *.tfplan
+*.tofuplan
 crash.log
 crash.*.log
 *.tfvars
