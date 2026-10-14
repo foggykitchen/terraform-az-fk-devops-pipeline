@@ -38,7 +38,7 @@ The module intentionally does **not** create:
 - YAML pipeline file content; only its repository-relative path is accepted
 - Source repositories, Azure resources, Azure role assignments, environments or approval/check policies
 
-**All delivery logic remains in YAML.** The examples commit only trivial placeholder files so the referenced paths exist; they are not deployment templates.
+**All delivery logic remains in caller-owned YAML.** Example 01 includes a reference copy of a container build, smoke test and image archive publication workflow. Example 02 retains a minimal placeholder for its resource-authorization lesson. Neither contains an OpenTofu plan/apply template.
 
 ---
 
@@ -99,7 +99,7 @@ terraform-az-fk-devops-pipeline/
 └── README.md
 ```
 
-Examples use responsibility-named `devops.tf` and `pipeline.tf`, plus `providers.tf`, `variables.tf`, `outputs.tf`, `terraform.tfvars.example`, `README.md` and a minimal `azure-pipelines.yml` placeholder. Example 01 also creates its Resource Group in `resource_group.tf`. Lockfiles and state are ignored.
+Examples use responsibility-named `devops.tf` and `pipeline.tf`, plus `providers.tf`, `variables.tf`, `outputs.tf`, `terraform.tfvars.example`, `README.md` and an `azure-pipelines.yml` reference file. Example 01 also creates its Resource Group in `resource_group.tf`. Lockfiles and state are ignored.
 
 ---
 
@@ -109,7 +109,7 @@ After composing `terraform-az-fk-devops` as `module.devops` with a `hello_world`
 
 ```hcl
 module "pipeline" {
-  source = "git::https://github.com/foggykitchen/terraform-az-fk-devops-pipeline.git?ref=v0.1.0"
+  source = "git::https://github.com/foggykitchen/terraform-az-fk-devops-pipeline.git?ref=v0.1.1"
 
   project_id            = module.devops.project_id
   pipeline_name         = "fk-delivery"
@@ -166,10 +166,10 @@ See [variables.tf](variables.tf) for the exact nested object schema and validati
 
 ## 🧭 Examples
 
-- [01_pipeline_definition_github_source](examples/01_pipeline_definition_github_source/): minimal GitHub pointer with upstream project/WIF/GitHub outputs.
+- [01_pipeline_definition_github_source](examples/01_pipeline_definition_github_source/): GitHub pointer with upstream project/WIF/GitHub outputs and a caller-owned container build workflow.
 - [02_pipeline_with_variable_group_authorization](examples/02_pipeline_with_variable_group_authorization/): adds upstream nonsecret group attachment and per-pipeline authorization, demonstrating attachment and explicit permission as separate control-plane operations.
 
-See [examples](examples/README.md). Both placeholders contain no plan/apply or OIDC deployment logic.
+See [examples](examples/README.md). Example 01’s source YAML builds and tests the NGINX image and publishes its archive. Example 02’s YAML is a placeholder. Neither includes OpenTofu plan/apply or OIDC deployment logic.
 
 ---
 
@@ -200,7 +200,7 @@ Static verification completed on **October 14, 2026** with OpenTofu **1.11.6**:
 | Example 01 | Passed | Passed | Passed |
 | Example 02 | Passed | Passed | Passed |
 
-Both placeholder YAML files passed syntax checks. Initial module verification used static checks only. Example 01 subsequently completed a six-resource foundation apply and a four-resource full apply. API checks confirmed its GitHub/YAML pointer and individual endpoint permissions; Hello World run #1 succeeded. Runtime ARM OIDC authentication is not exercised by that placeholder. Example 02 remains statically validated only. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
+Both example YAML files passed syntax checks; Example 01’s Bash build scripts also passed syntax checks. Initial module verification used static checks only. Example 01 subsequently completed a six-resource foundation apply and a four-resource full apply. API checks confirmed its GitHub/YAML pointer and individual endpoint permissions. Connectivity run #1 succeeded, then container build #4 passed image build, HTTP smoke testing, export and `APPLICATION_DOCKER_IMAGE` publication. The container build does not exercise runtime ARM OIDC authentication. Example 02 remains statically validated only. Static validation does not verify remote YAML availability, organization permissions or runtime OIDC authentication.
 
 ---
 

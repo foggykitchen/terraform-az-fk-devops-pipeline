@@ -5,7 +5,7 @@ The examples are designed as **incremental building blocks**, starting with a Gi
 
 These examples are part of the **[FoggyKitchen.com training ecosystem](https://foggykitchen.com/courses)** and focus on Azure Pipelines control-plane configuration.
 
-**Pipeline delivery logic remains in caller-owned YAML.** Each example includes only a trivial placeholder file; neither implements an OpenTofu plan/apply workflow.
+**Pipeline delivery logic remains in caller-owned YAML.** Example 01 demonstrates container image build, HTTP smoke testing and image archive publication. Example 02 uses a placeholder to focus on variable-group wiring. Neither implements an OpenTofu plan/apply workflow.
 
 ---
 
@@ -13,7 +13,7 @@ These examples are part of the **[FoggyKitchen.com training ecosystem](https://f
 
 | Example | Title | Key Topics |
 |:-------:|:------|:-----------|
-| [01](01_pipeline_definition_github_source/) | **Pipeline Definition with GitHub Source** | Upstream project/WIF composition, upstream GitHub connection, YAML path, individual endpoint permissions |
+| [01](01_pipeline_definition_github_source/) | **Container Build with GitHub Source** | Upstream project/WIF/GitHub composition, YAML pointer, container build, smoke test, image archive artifact |
 | [02](02_pipeline_with_variable_group_authorization/) | **Pipeline with Variable Group Authorization** | Same foundation, upstream nonsecret configuration group, definition attachment, individual group permissions |
 
 Each example builds on the **concepts** introduced in the previous one, but uses its own configuration and state. The examples use different project names: `fk-pipeline-01` and `fk-pipeline-02`.
@@ -29,7 +29,7 @@ Each example directory contains:
 - A safe `terraform.tfvars.example` containing only nonsecret placeholders
 - Explicit provider version and upstream module commit pins
 - An architecture diagram and an Azure DevOps portal evidence section
-- A minimal `azure-pipelines.yml` placeholder referenced by the definition
+- An `azure-pipelines.yml` reference file; actual pipeline execution reads the source repository’s file
 
 Start with static checks:
 
@@ -47,7 +47,7 @@ The recommended learning sequence is:
 
 Read the selected example's Deployment Steps before provisioning it. Both require an existing Azure DevOps organization and subscription, bootstrap authentication and administration rights. The upstream module now creates the GitHub PAT source connection and supplies its ID to the pipeline module. Configure `AZDO_GITHUB_SERVICE_CONNECTION_PAT` externally; Terraform handles the creation order. The PAT is retained in state, which must be protected. Both examples pin the upstream Git dependency to the reviewed v0.2.0 commit. The ARM OIDC connection does not authenticate GitHub.
 
-Both examples passed static validation with OpenTofu **1.11.6** on **October 14, 2026**. Initial verification used static checks only. Example 01 subsequently completed both its six-resource foundation apply and four-resource full apply. Its GitHub checkout and Hello World run #1 succeeded; ARM runtime OIDC exchange remains untested. Example 02 has not been deployed.
+Both examples passed static validation with OpenTofu **1.11.6** on **October 14, 2026**. Initial verification used static checks only. Example 01 subsequently completed both its six-resource foundation apply and four-resource full apply. Its GitHub connectivity run #1 succeeded, followed by container build #4 with HTTP smoke test and published `APPLICATION_DOCKER_IMAGE`. ARM runtime OIDC exchange remains untested. Example 02 has not been deployed.
 
 ---
 
