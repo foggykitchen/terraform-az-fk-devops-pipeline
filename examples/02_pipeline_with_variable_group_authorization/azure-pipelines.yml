@@ -1,0 +1,7 @@
+# Placeholder only; the plan/apply reference pipeline is a separate deliverable.
+trigger: none
+pr: none
+pool:
+  vmImage: ubuntu-latest
+steps:
+  - script: echo "Pipeline definition placeholder"
