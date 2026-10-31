@@ -213,6 +213,13 @@ Both example YAML files and their Bash scripts passed syntax checks. Initial mod
 
 ---
 
+## Related technical articles
+
+- [Azure DevOps with Terraform: Build and Deploy to Private AKS](https://foggykitchen.com/2026/10/26/azure-devops-with-terraform-private-aks-delivery/)
+  — Follow the boundary between Terraform-managed pipeline registration and application-owned YAML, including private ACR builds and digest-based AKS deployment.
+
+---
+
 ## 🪪 License
 
 Licensed under the **Universal Permissive License (UPL), Version 1.0**.
